@@ -16,24 +16,68 @@ public class Launcher {
 
         print("Printing interval");
         interval();
+
+        print("Printing create");
+        create();
+
+        print("Printing filtering");
+        filtering();
+    }
+
+    private static void filtering() {
+
+        Observable<String> source = Observable.create(emitter -> {
+            emitter.onNext("One");
+            emitter.onNext("Two");
+            emitter.onNext("Three");
+            emitter.onNext("Four");
+            emitter.onNext("Five");
+            emitter.onNext("Six");
+            emitter.onNext("Seven");
+        });
+
+      /*  Observable<Integer> lengths = source.map(String::length);
+        Observable<Integer> filtered = lengths.filter(integer -> integer >= 5);
+        filtered.subscribe(System.out::println);*/
+
+        source.map(String::length)
+                .filter(integer -> integer >= 5)
+                .subscribe(System.out::println);
+    }
+
+    private static void create() {
+
+        Observable<Integer> source = Observable.create(emitter -> {
+            emitter.onNext(2);
+            emitter.onNext(3);
+            emitter.onNext(4);
+            emitter.onNext(5);
+            try {
+                emitter.onNext(10 / 0);
+            } catch (Throwable error) {
+                print("Printing error");
+                emitter.onError(error);
+            }
+            emitter.onComplete();
+        });
+
+        source.subscribe(System.out::println, Throwable::printStackTrace);
     }
 
     private static void interval() {
+        Observable<Long> interval = Observable.interval(1, TimeUnit.SECONDS);
 
-        Observable<Long> secondInterval = Observable.interval(1, TimeUnit.SECONDS);
-
-        secondInterval.subscribe(System.out::println);
+        interval.subscribe(System.out::println);
 
         sleep();
-
     }
 
     private static void just() {
-      Observable<String> myString = Observable.just("One", "Two", "Three", "Four", "Five");
+        Observable<String> myString = Observable.just("One", "Two", "Three");
 
-      myString
-              .map(String::length)
-              .subscribe(System.out::println);
+        myString
+                .map(String::length)
+                .subscribe(System.out::println);
     }
 
     //region general methods
